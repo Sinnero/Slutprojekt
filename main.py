@@ -39,7 +39,7 @@ def graphical_menu():
 
     ctk.set_appearance_mode("Dark")
     ctk.set_default_color_theme("dark-blue")
-    appWidth, appHeight = 900, 700
+    appWidth, appHeight = 760, 700
 
     class App(ctk.CTk):
         def __init__(self, *args, **kwargs):
@@ -49,6 +49,8 @@ def graphical_menu():
             self.title("GUI Application")
             # Sets the dimensions of the window to 600x700
             self.geometry(f"{appWidth}x{appHeight}")
+
+            self.resizable(False, False)
 
             # Name Labels
             self.nameLabel = ctk.CTkLabel(self,
@@ -88,13 +90,13 @@ def graphical_menu():
                                             padx=0, pady=0,
                                             sticky="ew")
                 row_count += 1
-            #Generate results Button
-            self.generateResultsButton = ctk.CTkButton(self,
+            #Start script Button
+            self.StartScriptButton = ctk.CTkButton(self,
                                                        text="Start Script",
                                                        command=self.generateResults,
                                                        width=200)
-            self.generateResultsButton.grid(row=int(row_count), column=column_count + 4,
-                                            columnspan=1, padx=20,
+            self.StartScriptButton.grid(row=1, column=column_count + 0,
+                                            columnspan=1, padx=0,
                                             pady=20, sticky="ew")
             #Input label for "Input" text
             self.inputLabel = ctk.CTkLabel(self,
@@ -110,33 +112,48 @@ def graphical_menu():
             self.inputEntry.grid(row=int(row_count + 1), column=0,
                                  columnspan=1, padx=40,
                                  pady=0, sticky="ew")
-            #input enter button
-            """self.inputEnterButton = ctk.CTkButton(self,
-                                                       text="Start Script",
-                                                       command=self.,
-                                                       width=200)
-            self.inputEnterButton.grid(row=int(row_count), column=column_count + 4,
-                                            columnspan=1, padx=20,
-                                            pady=20, sticky="ew")"""
+            #Input clear button
+            self.inputClearButton = ctk.CTkButton(self,
+                                                       text="Clear Input",
+                                                       command=self.clear_Input_Output,
+                                                       width=50)
+            self.inputClearButton.grid(row=int(row_count+2), column=column_count,
+                                            columnspan=1, padx=10,
+                                            pady=20, sticky="ew")
             #Output text
 
             self.outputLabel = ctk.CTkLabel(self,
                                            text="Output",
                                            font=("Arial", 18))
-            self.outputLabel.grid(row=int(row_count), column=2,
+            self.outputLabel.grid(row=int(row_count), column=1,
                                  padx=110, pady=0,
                                  sticky="ew")
             #Output Display Box
-            self.Output_displayBox = ctk.CTkTextbox(self,
+            self.outputDisplayBox = ctk.CTkTextbox(self,
                                              width=100,
                                              height=150)
-            self.Output_displayBox.grid(row=int(row_count + 1), column=1,
+            self.outputDisplayBox.grid(row=int(row_count + 1), column=1,
                                  columnspan=4, padx=0,
                                  pady=20, sticky="nsew")
-            self.Output_displayBox.insert("0.0", "Output")
-            self.Output_displayBox.configure(state="disabled")
+            self.outputDisplayBox.insert("0.0", "Output")
+            self.outputDisplayBox.configure(state="disabled")
+            #Output copy to clipboard
+            self.outputCopyclipboardButton = ctk.CTkButton(self,
+                                                       text="Copy output to clipboard",
+                                                       command=self.copyClipboard,
+                                                       width=200)
+            self.outputCopyclipboardButton.grid(row=int(row_count+2), column=column_count + 2,
+                                            columnspan=1, padx=0,
+                                            pady=20, sticky="ew")
+        def copyClipboard(self):
+            outputText = self.outputDisplayBox.get("1.0", "end")
+            print(outputText)
+            os.system("echo " + str(outputText.strip()) + "| clip")
+        def clear_Input_Output(self):
+            self.inputEntry.delete("1.0", "end")
         def generateResults(self):
             def Window(Error):
+                global Window
                 ctk.set_appearance_mode("Dark")
                 Error_window = ctk.CTkToplevel(self)
                 Error_window.title("Hello")
@@ -153,17 +170,17 @@ def graphical_menu():
             script_dir = self.scriptInit.get()
             try:
                 with open(script_dir, "r") as script:
-                    global input_string
+                    global input_string, outputText
                     input_string = self.inputEntry.get("1.0", "end")
                     def outputText(output):
-                        self.Output_displayBox.configure(state="normal")
-                        self.Output_displayBox.delete("0.0", "end")
-                        self.Output_displayBox.insert("0.0", output)
-                        self.Output_displayBox.configure(state="disabled")
+                        self.outputDisplayBox.configure(state="normal")
+                        self.outputDisplayBox.delete("0.0", "end")
+                        self.outputDisplayBox.insert("0.0", output)
+                        self.outputDisplayBox.configure(state="disabled")
                     try:
                         exec(script.read())
-                    except:
-                        Window("Error while loading: " + str(script_dir))
+                    except() as error:
+                        Window("Error while loading: " + str(script_dir) + error)
 
             except(FileNotFoundError) as f:
                 ErrorString = str(f)[37:].strip("'")
