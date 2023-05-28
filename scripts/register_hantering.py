@@ -1,6 +1,3 @@
-import os
-
-import customtkinter as ctk
 import json
 globals()
 ctk.set_appearance_mode("Dark")
@@ -11,8 +8,6 @@ options = ["Enter new person", "Remove person", "Search for person's phone numbe
            "See who has given date of birth", "Print all people (in alphabetical order)",
            "Change working registry", "Exit"]
 registry_file = "assets/register_hantering.reg"
-width = self.winfo_width()
-print(width)
 selection_window.geometry("275x650"+f"+{self.winfo_x()}+{self.winfo_y()}")
 selection_window.resizable(False, False)
 #Used to load the current register.
@@ -58,7 +53,7 @@ def init_window(commit, Entry_Activated=False, Phone_Activated=False, SSN_Activa
     selection_window.withdraw()
     ctk.set_appearance_mode("Dark")
     enter_window = ctk.CTkToplevel(selection_window)
-    enter_window.title("Remove person")
+    enter_window.title("Selection")
     enter_window.geometry("300x250" + f"+{selection_window.winfo_x()}+{selection_window.winfo_y()}")
     SSN_Entry = ctk.CTkEntry(enter_window, placeholder_text=placeholder_SSN, height=50, width=150)
     Name_Entry = ctk.CTkEntry(enter_window, placeholder_text="Name", height=50, width=150)
