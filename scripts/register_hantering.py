@@ -1,3 +1,5 @@
+import os
+
 import customtkinter as ctk
 import json
 globals()
@@ -7,25 +9,37 @@ selection_window.title("Registry management")
 options = ["Enter new person", "Remove person", "Search for person's phone number",
            "Search for person's date of birth", "See who has given phone number",
            "See who has given date of birth", "Print all people (in alphabetical order)",
-           "Write the register to a file", "Read a register from a file",
-           "Exit"]
-asset_file = "assets"
+           "Change working registry", "Exit"]
+registry_file = "assets/register_hantering.reg"
 width = self.winfo_width()
 print(width)
 selection_window.geometry("275x650"+f"+{self.winfo_x()}+{self.winfo_y()}")
 selection_window.resizable(False, False)
 #Used to load the current register.
 def load_registret():
-    global asset_file, json
-    with open(asset_file + "/register_hantering.reg", "r") as file:
-        registret_string = file.read()
-        registret = json.loads(registret_string)
-        return registret
-
+    global registry_file, json, outputText
+    try:
+        with open(registry_file, "r") as file:
+            registret_string = file.read()
+            registret = json.loads(registret_string)
+            return registret
+    except:
+        with open(registry_file, "w") as file:
+            yes_no = ctk.CTkInputDialog(text="This file is not an registry.\nDo you want to make it one? Yes/No", title="Test").get_input()
+            print(yes_no)
+            if yes_no.lower() == "yes":
+                file.write("{}")
+                return {}
+            elif yes_no.lower() == "no":
+                outputText("Registry assignment terminated.")
+                selection_window.destroy()
+            else:
+                outputText("Error, only Yes/No answers are accepted.")
+                selection_window.destroy()
 #Will print the specified register to the file.
 def dump_registret_file(registret):
-    global json
-    with open(asset_file + "/register_hantering.reg", "w") as file:
+    global json, registry_file
+    with open(registry_file, "w") as file:
         json.dump(registret, file)
 
 #Makes the window priority over main GUI.
@@ -35,7 +49,7 @@ def stay_on_top():
     selection_window.after(400, stay_on_top)
 
 #Function where usage of name, SSN or Phone input fields are used.
-def init_window(commit, Entry_Activated=False, Phone_Activated=False, SSN_Activated=False, Name_Activated=False):
+def init_window(commit, Entry_Activated=False, Phone_Activated=False, SSN_Activated=False, Name_Activated=False, placeholder_SSN="YYYYMMDDNNNN"):
     def close():
         selection_window.deiconify()
         enter_window.destroy()
@@ -46,7 +60,7 @@ def init_window(commit, Entry_Activated=False, Phone_Activated=False, SSN_Activa
     enter_window = ctk.CTkToplevel(selection_window)
     enter_window.title("Remove person")
     enter_window.geometry("300x250" + f"+{selection_window.winfo_x()}+{selection_window.winfo_y()}")
-    SSN_Entry = ctk.CTkEntry(enter_window, placeholder_text="YYYYMMDD-NNNN", height=50, width=150)
+    SSN_Entry = ctk.CTkEntry(enter_window, placeholder_text=placeholder_SSN, height=50, width=150)
     Name_Entry = ctk.CTkEntry(enter_window, placeholder_text="Name", height=50, width=150)
     DoneButton = ctk.CTkButton(enter_window, text="Execute",
                                command=lambda: commit(name=Name_Entry.get(), SSN=SSN_Entry.get(), phone=Phone_Entry.get()), width=150, height=50,
@@ -60,7 +74,10 @@ def init_window(commit, Entry_Activated=False, Phone_Activated=False, SSN_Activa
     if Entry_Activated == True:
         Entry_Message.grid(row=1, column=1, padx=8)
     if Phone_Activated == True:
-        Phone_Entry.grid(row=2, column=0)
+        if SSN_Activated == False:
+            Phone_Entry.grid(row=0, column=0)
+        else:
+            Phone_Entry.grid(row=2, column=0)
     if SSN_Activated == True:
         SSN_Entry.grid(row=0, column=0)
     if Name_Activated == True:
@@ -69,15 +86,6 @@ def init_window(commit, Entry_Activated=False, Phone_Activated=False, SSN_Activa
     enter_window.resizable(False, False)
     enter_window.protocol("WM_DELETE_WINDOW", commit)
     return enter_window, close, Entry_Message, SSN_Entry, Name_Entry, Phone_Entry
-def control_of_SSN(SSN):
-    if len(SSN) >= 12:
-        try:
-            if not(int(SSN[4:5]) > 12):
-                None
-            else:
-                return False
-        except:
-            return False
 #Function for entering a new person into database.
 def Enter_new_person():
     #Global dependecies that is used.
@@ -106,7 +114,7 @@ def Enter_new_person():
             #If not return error.
             commited("Please enter SSN and Name")
             return None
-        if len(SSN) != 13:
+        if len(SSN) != 12:
             #If SSN
             commited("Incorrect SSN format.")
             return None
@@ -123,7 +131,7 @@ def Remove_person():
     def commit(name, SSN, phone=None):
         if name != "" and SSN != "":
             change_text("You can't enter both SSN and name.")
-            enter_window.destroy()
+            close()
             return None
         if name != "":
             registret = load_registret()
@@ -134,6 +142,7 @@ def Remove_person():
                 if registret[SSN]["name"] == name:
                     #Add name found to dict.
                     SSN_to_delete[SSN] = name
+            #Print out all possible matches and let the user choose from them.
             if len(SSN_to_delete) > 1:
                 String_of_names = ""
                 for SSN in SSN_to_delete:
@@ -141,11 +150,13 @@ def Remove_person():
                     String_of_names += f"(Name: {SSN_to_delete[SSN]}\n SSN: {SSN}) \n"
                 change_text(f"Please specify which SSN of these ({len(SSN)}) you want to delete: \n" + String_of_names)
                 close()
+            #If there only is one match then remove it from the list.
             else:
                 try:
                     del registret[SSN]
                     dump_registret_file(registret)
-                    change_text(name + " was removed.")
+                    change_text(name + " has been removed.")
+                #If it's not even in the list raise an error.
                 except:
                     change_text("Name has already been removed.")
                 close()
@@ -155,7 +166,7 @@ def Remove_person():
                 del registret[SSN]
                 try:
                     dump_registret_file(registret)
-                    change_text(SSN + "has been removed.")
+                    change_text(SSN + " has been removed.")
                 except:
                     change_text("SSN has already been removed.")
                 close()
@@ -168,35 +179,154 @@ def Remove_person():
     #Get tuple from init_window function.
     enter_window, close, Entry_Message, SSN_Entry, Name_Entry, Phone_Entry = init_window(commit, SSN_Activated=True, Name_Activated=True)
 def Search_phone():
-    def commit(phone, name=None, SSN=None):
+    def commit(SSN=None, name=None, phone=None):
+        registret = load_registret()
+        String_of_phones = f"Search for phone '{phone}':\n"
+        #Goes throgh every person in registry.
+        for person in registret:
+            #Will detect if there is a match between entered phone and a phone in database.
+            if registret[person]["phone"][0:len(phone)] == phone:
+                #If there is a match add the match to the finished string
+                String_of_phones += f"---------------\nPhone: '{registret[person]['phone']}'\nSSN: {person}\nName: {registret[person]['name']}\n"
+        #If the string contains something other than original assignment
+        if String_of_phones != f"Search for {phone} returned:":
+            #Change output text to search results.
+            change_text(String_of_phones)
+            close()
+        else:
+            change_text(f"No owners found for\nPhone: '{phone}'")
+            close()
+    enter_window, close, Entry_Message, SSN_Entry, Name_Entry, Phone_Entry = init_window(commit, Phone_Activated=True)
+def Search_birth():
+    def commit(SSN=None, name=None, phone=None):
+        registret = load_registret()
+        String_of_dates = f"Search for date: '{SSN}':\n"
+        #Goes throgh every person in registry.
+        for person in registret:
+            #Will detect if there is a match between entered phone and a phone in database.
+            if person[0:len(SSN)] == SSN:
+                #If there is a match add the match to the finished string
+                String_of_dates += f"---------------\nSSN: {person}\n Name: {registret[person]['name']}\n"
+        #If the string contains something other than original assignment
+        if String_of_dates != f"Search for {SSN} returned:":
+            #Change output text to search results.
+            change_text(String_of_dates)
+            close()
+        else:
+            change_text(f"No owners found for\nDate: '{SSN}'")
+            close()
+    enter_window, close, Entry_Message, SSN_Entry, Name_Entry, Phone_Entry = init_window(commit, SSN_Activated=True, placeholder_SSN="Search (YYYYMMDD): ")
+
+def Search_given_phone():
+    def commit(SSN=None, name=None, phone=None):
+        #SSN will be equal to inputted phone number.
+        #It's  just easier to define it as SSN because of how the GUI works.
         registret = load_registret()
         String_of_phones = ""
-        for SSN in registret:
-            if registret[SSN]["phone"] == phone:
-                String_of_phones += f"Owner for '{phone}'\nSSN: {SSN}\nName: {registret[SSN]['name']}\n"
+        for person in registret:
+            if registret[person]["phone"] == phone:
+                String_of_phones += f"Owner for '{phone}'\nSSN: {person}\nName: {registret[person]['name']}\n"
         if String_of_phones != "":
             change_text(String_of_phones)
             close()
         else:
-            change_text(f"No owners found for\nPhone: {phone}")
+            change_text(f"No owners found for\nPhone: '{phone}'")
             close()
     enter_window, close, Entry_Message, SSN_Entry, Name_Entry, Phone_Entry = init_window(commit, Phone_Activated=True)
-def Search_birth():
+def Search_given_SSN():
     def commit(SSN, phone=None, name=None):
-
+        registret = load_registret()
+        String_of_Birth_Dates = f"Matching SSN with birthdate\n({SSN}):\n"
+        for people in registret:
+            print(people[0:8])
+            if people == SSN:
+                String_of_Birth_Dates += f"'SSN:{people}\nName:{registret[people]['name']}'\n"
+        if String_of_Birth_Dates == f"Matching SSN with birthdate\n({SSN}):\n":
+            change_text(f"No SSN found matching {SSN}")
+            close()
+        else:
+            change_text(String_of_Birth_Dates)
+            close()
     enter_window, close, Entry_Message, SSN_Entry, Name_Entry, Phone_Entry = init_window(commit, SSN_Activated=True)
-def print_all():
+def Print_all_Names():
     global load_registret
     registret = load_registret()
     Alphabetic_order_list = []
     for person in registret:
-        Alphabetic_order_list.append(registret[person]["name"])
+        Alphabetic_order_list.append(f"{registret[person]['name']}, {person}")
     #Sort list alphabetically
     Alphabetic_order_list.sort()
     name_string = ""
     for people in Alphabetic_order_list:
         name_string += people + "\n"
     change_text(name_string)
+def Change_registry():
+    selection_window.withdraw()
+    new_file_name = tk.filedialog.askopenfilename(initialdir = os.getcwd()+r"\assets",
+                                          title = "Select a File",
+                                          filetypes = (("Reg files",
+                                                        "*.reg*"),
+                                                       ("all files",
+                                                        "*.*")))
+    if new_file_name != "":
+        print(new_file_name[0:len(os.getcwd()+"/assets")])
+        print(os.getcwd().replace("\\", "/")+"/assets")
+        if new_file_name[0:len(os.getcwd()+"/assets")] != os.getcwd().replace("\\", "/")+"/assets":
+            change_text("Registry must be inside " + os.getcwd()+"/assets")
+            selection_window.deiconify()
+        else:
+            global registry_file
+            registry_file = new_file_name
+            change_text("Current working registry changed to " + new_file_name[len(os.getcwd()+"/assets")+1:])
+            selection_window.deiconify()
+    else:
+        change_text("Registry assignment terminated.")
+        selection_window.deiconify()
+
+def option_taken():
+    global scriptInit, selection_window, row_count, \
+        Enter_new_person, dump_registret_file, change_text, \
+        Print_all_Names, Remove_person, Search_phone, Search_birth, \
+        Search_given_SSN, Search_given_phone, Change_registry
+    change_text("Output")
+    print(scriptInit.get())
+    option = scriptInit.get()
+    if option == "0":
+        return_call = Enter_new_person()
+        if return_call != None:
+            change_text(return_call)
+    elif option == "1":
+        return_call = Remove_person()
+        if return_call != None:
+            change_text(return_call)
+    elif option == "2":
+        return_call = Search_phone()
+        if return_call != None:
+            change_text(return_call)
+    elif option == "3":
+        return_call = Search_birth()
+        if return_call != None:
+            change_text(return_call)
+    elif option == "4":
+        return_call = Search_given_phone()
+        if return_call != None:
+            change_text(return_call)
+    elif option == "5":
+        return_call = Search_given_SSN()
+        if return_call != None:
+            change_text(return_call)
+    elif option == "6":
+        return_call = Print_all_Names()
+        if return_call != None:
+            change_text(return_call)
+    elif option == "7":
+        return_call = Change_registry()
+        if return_call != None:
+            change_text(return_call)
+    elif option == "8":
+        outputText("Registry manager session was terminated.")
+        selection_window.destroy()
+        return None
 
 scriptInit = ctk.StringVar(value="None")
 row_count = 0
@@ -222,54 +352,6 @@ def change_text(text):
     selection_window.text.insert("0.0", text)
     selection_window.text.configure(state="disabled")
 change_text("Output")
-
-def option_taken():
-    global scriptInit, selection_window, row_count, Enter_new_person, dump_registret_file, change_text, print_all, Remove_person, Search_phone
-    change_text("Output")
-    print(scriptInit.get())
-    option = scriptInit.get()
-    if option == "0":
-        return_call = Enter_new_person()
-        if return_call != None:
-            change_text(return_call)
-    elif option == "1":
-        return_call = Remove_person()
-        if return_call != None:
-            change_text(return_call)
-    elif option == "2":
-        return_call = Search_phone()
-        if return_call != None:
-            change_text(return_call)
-    elif option == "3":
-        return_call = Enter_new_person()
-        if return_call != None:
-            change_text(return_call)
-    elif option == "4":
-        return_call = Enter_new_person()
-        if return_call != None:
-            change_text(return_call)
-    elif option == "5":
-        return_call = Enter_new_person()
-        if return_call != None:
-            change_text(return_call)
-    elif option == "6":
-        return_call = print_all()
-        if return_call != None:
-            change_text(return_call)
-    elif option == "7":
-        return_call = Enter_new_person()
-        if return_call != None:
-            change_text(return_call)
-    elif option == "8":
-        return_call = Enter_new_person()
-        if return_call != None:
-            change_text(return_call)
-    elif option == "9":
-        outputText("Register hantering session was destroyed.")
-        selection_window.destroy()
-        return None
-
-
 
 selection_window_button = ctk.CTkButton(selection_window,
                                            text="Done",
