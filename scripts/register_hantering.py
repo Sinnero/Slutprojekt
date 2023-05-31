@@ -346,13 +346,16 @@ def change_text(text):
     selection_window.text.delete("0.0", "end")
     selection_window.text.insert("0.0", text)
     selection_window.text.configure(state="disabled")
+
 change_text("Output")
 
 selection_window_button = ctk.CTkButton(selection_window,
                                            text="Done",
                                            command=option_taken,
                                            width=30)
+
 selection_window_button.grid(row=int(row_count+1), column=0,
                                 columnspan=1, padx=0,
                                 pady=20, sticky="ew")
+
 stay_on_top()

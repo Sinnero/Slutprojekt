@@ -178,6 +178,7 @@ def graphical_menu():
                         self.outputDisplayBox.insert("0.0", output)
                         self.outputDisplayBox.configure(state="disabled")
                     try:
+                        globals()["self"] = self
                         exec(script.read())
                     except() as error:
                         Window("Error while loading: " + str(script_dir) + error)
