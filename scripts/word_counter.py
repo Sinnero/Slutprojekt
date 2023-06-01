@@ -1,5 +1,6 @@
 #Counts words and characters
-#of inputfield
+#of inputfield.
+#Creator: Axel
 filetxt = input_string
 print(filetxt)
 global output

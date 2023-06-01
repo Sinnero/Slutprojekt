@@ -17,13 +17,15 @@ def load_scripts_descriptions(files_list):
             line = 0
             #Checkar om filen har en description som ska visas i scriptloadern eller inte.
             for item in lines:
+                #Kollar om första raden i koden är kommenterad.
                 if item[0] == "#":
                     description += item[1:]
                 elif item[0] != "#":
                     if line == 0:
-                        description = "No description" #Om
+                        description = "No description" #Om ingen beskrivning hittades i början av scriptet
                     else:
                         break
+                #Kollar nästa rad av script.
                 line += 1
             description_dict[files] = description
     return description_dict
@@ -51,6 +53,7 @@ def graphical_menu():
             # Sets the dimensions of the window to 600x700
             self.geometry(f"{appWidth}x{appHeight}")
 
+            #Makes the window unsizeable
             self.resizable(False, False)
 
             # Name Labels
@@ -58,6 +61,7 @@ def graphical_menu():
             row_count = 2
             column_count = 0
             all_scripts = load_scripts()
+            #Makes a scrollable interface that contains all scripts.
             scrollable_buttons = ctk.CTkScrollableFrame(self, height=175, width=500)
             scrollable_buttons.grid(row=1, column=0, columnspan=3)
             for script in all_scripts:

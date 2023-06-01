@@ -1,3 +1,5 @@
+#Registry management.
+#Creator: Axel
 import json
 globals()
 ctk.set_appearance_mode("Dark")
