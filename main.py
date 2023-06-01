@@ -49,7 +49,8 @@ def graphical_menu():
             super().__init__(*args, **kwargs)
 
             # Sets the title of the window to "App"
-            self.title("GUI Application")
+            self.title("Script loader")
+
             # Sets the dimensions of the window to 600x700
             self.geometry(f"{appWidth}x{appHeight}")
 
@@ -76,7 +77,7 @@ def graphical_menu():
                                  sticky="ew")
                 #Individual description for all scripts.
                 self.desc_previewLabel = ctk.CTkLabel(scrollable_buttons,
-                                                      text=f'{description[0:55]}')
+                                                      text=f'{description[0:60]}')
                 self.desc_previewLabel.grid(row=row_count, column=column_count + 1,
                                             padx=0, pady=0,
                                             sticky="ew")
@@ -136,6 +137,7 @@ def graphical_menu():
             self.outputCopyclipboardButton.grid(row=int(row_count+2), column=column_count + 2,
                                             columnspan=1, padx=0,
                                             pady=20, sticky="ew")
+        #Function for copying current text displayed in output to the clipboard.
         def copyClipboard(self):
             outputText = self.outputDisplayBox.get("1.0", "end")
             print(outputText)
@@ -143,11 +145,13 @@ def graphical_menu():
         def clear_Input_Output(self):
             self.inputEntry.delete("1.0", "end")
         def generateResults(self):
+            # Funktion för att start ett error fönster om ett fel uppstår.
             def Window(Error):
                 global Window
-                ctk.set_appearance_mode("Dark")
+                # Creates the Tkinter window.
                 Error_window = ctk.CTkToplevel(self)
                 Error_window.title("Hello")
+                # Function to make the Error window always on top of main script loader.
                 def stay_on_top():
                     Error_window.lift()
                     Error_window.after(200, stay_on_top)
@@ -171,17 +175,16 @@ def graphical_menu():
                         self.outputDisplayBox.insert("0.0", output)
                         self.outputDisplayBox.configure(state="disabled")
                     try:
-                        globals()["self"] = self
                         exec(script.read())
                     except() as error:
                         Window("Error while loading: " + str(script_dir) + error)
-
+            # Raise the encountered error to the user.
             except(FileNotFoundError) as f:
                 ErrorString = str(f)[37:].strip("'")
                 if ErrorString == "None":
                     Window("Please select a script.")
                 else:
-                    Window("Script got moved or deleted:" + ErrorString)
+                    Window("Script got moved or deleted. \nOr the file may be corrupt.")
 
     if __name__ == "__main__":
         app = App()

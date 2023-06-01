@@ -7,7 +7,7 @@ selection_window = ctk.CTkToplevel(self)#95244
 selection_window.title("Registry management")
 options = ["Enter new person", "Remove person", "Search for person's phone number",
            "Search for person's date of birth", "See who has given phone number",
-           "See who has given date of birth", "Print all people (in alphabetical order)",
+           "See who has given SSN", "Print all people (in alphabetical order)",
            "Change working registry", "Exit"]
 registry_file = "assets/register_hantering.reg"
 selection_window.geometry("275x650"+f"+{self.winfo_x()}+{self.winfo_y()}")
@@ -23,7 +23,6 @@ def load_registret():
     except:
         with open(registry_file, "w") as file:
             yes_no = ctk.CTkInputDialog(text="This file is not an registry.\nDo you want to make it one? Yes/No", title="Test").get_input()
-            print(yes_no)
             if yes_no.lower() == "yes":
                 file.write("{}")
                 return {}
@@ -230,12 +229,12 @@ def Search_given_phone():
             change_text(f"No owners found for\nPhone: '{phone}'")
             close()
     enter_window, close, Entry_Message, SSN_Entry, Name_Entry, Phone_Entry = init_window(commit, Phone_Activated=True)
+# Function for searching of a SSN.
 def Search_given_SSN():
     def commit(SSN, phone=None, name=None):
         registret = load_registret()
         String_of_Birth_Dates = f"Matching SSN with birthdate\n({SSN}):\n"
         for people in registret:
-            print(people[0:8])
             if people == SSN:
                 String_of_Birth_Dates += f"'SSN:{people}\nName:{registret[people]['name']}'\n"
         if String_of_Birth_Dates == f"Matching SSN with birthdate\n({SSN}):\n":
@@ -244,19 +243,28 @@ def Search_given_SSN():
         else:
             change_text(String_of_Birth_Dates)
             close()
+
+    # Start a new window containing the required input field. And retrieve information.
     enter_window, close, Entry_Message, SSN_Entry, Name_Entry, Phone_Entry = init_window(commit, SSN_Activated=True)
+
+# Print out all the names in the selected registry.
 def Print_all_Names():
     global load_registret
+    # Load in the currect registry from file.
     registret = load_registret()
     Alphabetic_order_list = []
+    # Goes through everyone in registry.
     for person in registret:
         Alphabetic_order_list.append(f"{registret[person]['name']}, {person}")
-    #Sort list alphabetically
+    # Sort list alphabetically
     Alphabetic_order_list.sort()
     name_string = ""
+    # Goes through everyone in the list and adds them to the final string.
     for people in Alphabetic_order_list:
         name_string += people + "\n"
+    # Commit the string containing all people
     change_text(name_string)
+# Function for changing the current file registry.
 def Change_registry():
     selection_window.withdraw()
     new_file_name = tk.filedialog.askopenfilename(initialdir = os.getcwd()+r"\assets",
@@ -266,8 +274,6 @@ def Change_registry():
                                                        ("all files",
                                                         "*.*")))
     if new_file_name != "":
-        print(new_file_name[0:len(os.getcwd()+"/assets")])
-        print(os.getcwd().replace("\\", "/")+"/assets")
         if new_file_name[0:len(os.getcwd()+"/assets")] != os.getcwd().replace("\\", "/")+"/assets":
             change_text("Registry must be inside " + os.getcwd()+"/assets")
             selection_window.deiconify()
@@ -280,13 +286,13 @@ def Change_registry():
         change_text("Registry assignment terminated.")
         selection_window.deiconify()
 
+# Functyion for rendering everything.
 def option_taken():
     global scriptInit, selection_window, row_count, \
         Enter_new_person, dump_registret_file, change_text, \
         Print_all_Names, Remove_person, Search_phone, Search_birth, \
         Search_given_SSN, Search_given_phone, Change_registry
     change_text("Output")
-    print(scriptInit.get())
     option = scriptInit.get()
     if option == "0":
         return_call = Enter_new_person()
@@ -327,7 +333,7 @@ def option_taken():
 
 scriptInit = ctk.StringVar(value="None")
 row_count = 0
-#Button for each option
+# Button for each option
 for option in options:
     selection_window.scriptText = ctk.CTkRadioButton(selection_window,
                                          text=option,
@@ -337,8 +343,7 @@ for option in options:
                      padx=20, pady=10,
                      sticky="ew")
     row_count += 1
-print(scriptInit.get())
-#Small output window
+# Small output window
 selection_window.text = ctk.CTkTextbox(selection_window, height=150, state="normal", font=('Comic Sans MS', 15))
 selection_window.text.grid(row=int(row_count+3), column=0,
                             columnspan=1, padx=0,

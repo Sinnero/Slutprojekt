@@ -2,7 +2,6 @@
 #of inputfield.
 #Creator: Axel
 filetxt = input_string
-print(filetxt)
 global output
 number_words = str(len(filetxt.split()))
 number_characters = str(len(filetxt.strip()))

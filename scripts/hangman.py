@@ -26,36 +26,45 @@ def word_selection():
     global difficulty_button, word_selected
 
     selected_difficulty = difficulty_button.get()
-
+    # Word list for easy difficulty
     easy = ['about', 'after', 'again', 'below', 'could', 'every', 'first',
             'found', 'great', 'house', 'large', 'learn', 'never', 'other',
             'place', 'plant', 'point', 'right', 'small', 'sound', 'spell',
             'still', 'study', 'their', 'there', 'these', 'thing', 'think',
             'three', 'water','where','which','world','would','write']
 
+    # Word list for normal difficulty
     normal = ['happy', 'family', 'friend', 'school', 'music',
               'flower', 'guitar', 'piano', 'beach', 'mountain',
               'adventure', 'challenge', 'knowledge', 'education',
               'achieve', 'aspiration', 'ambition', 'innovation',
               'colonel']
 
+    # Word list for hard Difficulty
     hard = ['adventure', 'challenge', 'knowledge', 'education',
             'imagination', 'inspiration', 'motivation', 'opportunity',
             'nauseous']
 
+    # Word list for legend Difficulty
     legend = ['perseverance', 'determination', 'accomplishment',
               'achievement', 'aspiration', 'ambition', 'innovation', 'colonel']
 
     if selected_difficulty == "Easy":
         word_selected = easy[random.randint(0, len(easy)-1)]
+
     elif selected_difficulty == "Normal":
         word_selected = normal[random.randint(0, len(normal) - 1)]
+
     elif selected_difficulty == "Hard":
         word_selected = hard[random.randint(0, len(hard) - 1)]
+
     else:
         word_selected = legend[random.randint(0, len(legend) - 1)]
+
     # Used for counting the number of letters in the selected word.
     count = "1"
+
+    # Scans the selected word. And displays it as _ _ _ _ in the program.
     for character in word_selected:
         # Adds a label with text _ and a tuple containing information about the right letter.
         globals()["var" + count] = (character.upper(), ctk.CTkLabel(hangman_window, width=30, height=40,
@@ -63,15 +72,18 @@ def word_selection():
         globals()["var" + count][1].grid(row=0, column=count, padx=0)
         count = str(int(count) + 1)
 
+# Function for restarting the game.
 def re_run():
     global hangman_window, word_selection, \
         correct_count, error_count, image, \
-        possible_words_list, random, restart_button
+        random, restart_button
+    # Resets variables to their starting stage.
     correct_count = 0
     error_count = 2
-    random_word_selected = possible_words_list[random.randint(0, len(possible_words_list) - 1)]
     image.configure(light_image=Image.open(os.getcwd()+"/assets/hangman/number1.png"))
     restart_button.configure(state="disabled", fg_color="gray")
+
+    # Goes through all global variables.
     for variable in globals().copy():
         if variable[0:3] == "var":
             globals()[variable][1].destroy()
@@ -81,26 +93,28 @@ def re_run():
     word_selection()
 
 def end(Win=False):
-    global re_run, number_of_wins, restart_button
-    #Checks if win was defined
+    global re_run, number_of_wins, restart_button, \
+        number_of_losses
+    # Checks if win was defined
     restart_button.configure(state="normal", fg_color="#ffd000")
     if Win == False:
-        #Will display the correct word and make all buttons red.
+        # Will display the correct word and make all buttons red.
         for i in globals():
             if i[0:3] == "var":
                 globals()[i][1].configure(text=globals()[i][0])
             if i[1:] == "button":
                 globals()[i].configure(state="disabled", fg_color="red")
+        number_of_losses.configure(text=f"Losses: {int(number_of_losses.cget('text')[7:])+1}")
     elif Win == True:
-        #Display Win image
+        # Display Win image
         image.configure(light_image=Image.open(os.getcwd() + f"/assets/hangman/number11.png"))
 
-        #Will make a buttons green.
+        # Will make a buttons green.
         for i in globals():
             if i[1:] == "button":
                 globals()[i].configure(state="disabled", fg_color="green")
         number_of_wins.configure(text=f"Wins: {int(number_of_wins.cget('text')[5:])+1}")
-
+#
 def when_clickedd(letter):
     global image, Image, error_count, end, time, word_selected, correct_count
     found = False
@@ -111,13 +125,13 @@ def when_clickedd(letter):
                 found = True
                 correct_count += 1
     if found:
-        #Change color of button clicked to green if there was a match.
+        # Change color of button clicked to green if there was a match.
         globals()[letter + "button"].configure(fg_color="green", text_color="white", state="disabled")
-        #Checks if every letter has been entered.
+        # Checks if every letter has been entered.
         if correct_count == len(word_selected):
             end(Win=True)
     else:
-        #Change color of button clicked to red if there wasn't a match.
+        # Change color of button clicked to red if there wasn't a match.
         globals()[letter + "button"].configure(fg_color="red", text_color="white", state="disabled")
         if error_count <= 8:
             image.configure(light_image=Image.open(os.getcwd() + f"/assets/hangman/number{error_count}.png"))
@@ -128,11 +142,14 @@ def when_clickedd(letter):
     return None
 def run_buttons():
     global alphabet, when_clickedd, re_run, number_of_wins, \
-        restart_button, difficulty_button
+        number_of_losses, restart_button, difficulty_button
+
     # Rowcount for placing out the alphabetic buttons.
     alphabet_rowcount = 1
+
     # Columncount for placing out the alphabetic buttons.
     alphabet_columncount = 1
+
     # Goes through every letter in the alphabet.
     for letter in alphabet:
         # The command each alphabetic button will run when clicked.
@@ -144,20 +161,24 @@ def run_buttons():
             alphabet_rowcount += 1
             alphabet_columncount = 0
         alphabet_columncount += 1
+
     # Adds button for restarting the game.
     restart_button = ctk.CTkButton(hangman_window, text="Restart", command=re_run, height=40, width=120,
                                    state="disabled", fg_color="gray", font=("Arial", 25))
     restart_button.grid(row=6, column=1, columnspan=4, rowspan=2)
+
     # Difficulty selection label and button.
     difficulty_label = ctk.CTkLabel(hangman_window, text="Word Difficulty", height=20, width=90)
     difficulty_label.grid(row=6, column=5, columnspan=4)
     difficulty_button = ctk.CTkOptionMenu(hangman_window, values=["Easy", "Normal", "Hard", "Legend"],
                                           height=20, width=90)
     difficulty_button.grid(row=7, column=5, columnspan=4)
+
     # Label for counting wins.
     number_of_wins = ctk.CTkLabel(hangman_window, text="Wins: 0")
     number_of_wins.grid(row=6, column=0)
-    print(number_of_wins.cget("text"))
+    number_of_losses = ctk.CTkLabel(hangman_window, text="Losses: 0")
+    number_of_losses.grid(row=7, column=0)
 def stay_on_top():
     global hangman_window, stay_on_top
     hangman_window.lift()
