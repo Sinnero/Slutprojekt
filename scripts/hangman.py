@@ -10,7 +10,11 @@ hangman_window.geometry("900x375"+f"+{self.winfo_x()}+{self.winfo_y()}")
 hangman_window.resizable(False, False)
 # Makes the window priority over main GUI.
 
-possible_words_list = ["Hello", "Goodbye", "Please", "Thank", "You", "Sorry", "Yes", "No", "Can", "Will", "How", "What", "When", "Where", "Who", "Why", "Which", "Time", "Day", "Week", "Month", "Year", "Today", "Tomorrow", "Yesterday", "Morning", "Afternoon", "Evening", "Night", "Food", "Water", "Drink", "Eat", "Sleep", "Work", "Play", "Read", "Write", "Listen", "Speak"]
+possible_words_list = ['about', 'after', 'again', 'below', 'could', 'every', 'first',
+                       'found', 'great', 'house', 'large', 'learn', 'never', 'other',
+                       'place', 'plant', 'point', 'right', 'small', 'sound', 'spell',
+                       'still', 'study', 'their', 'there', 'these', 'thing', 'think',
+                       'three', 'water','where','which','world','would','write']
 alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 random_word_selected = possible_words_list[random.randint(0, len(possible_words_list)-1)]
 # Used for counting the number of letters in the selected word.
@@ -31,6 +35,13 @@ for i in random_word_selected:
                                            font=("Comic Sans MS Bold", 25.0), text="_"))
     globals()["var"+count][1].grid(row=0, column=count, padx=0)
     count = str(int(count)+1)
+
+def word_selection():
+    global difficulty_button, possible_words_list
+    selected_difficulty = difficulty_button.get()
+
+    if selected_difficulty == "Easy":
+        possible_words_list =
 def re_run():
     global hangman_window, random_word_selected, \
         correct_count, error_count, image, \
@@ -104,7 +115,8 @@ def when_clickedd(letter):
             end()
     return None
 def run_buttons():
-    global alphabet, when_clickedd, re_run, number_of_wins, restart_button
+    global alphabet, when_clickedd, re_run, number_of_wins, \
+        restart_button, difficulty_button
     # Rowcount for placing out the alphabetic buttons.
     alphabet_rowcount = 1
     # Columncount for placing out the alphabetic buttons.
@@ -120,10 +132,17 @@ def run_buttons():
             alphabet_rowcount += 1
             alphabet_columncount = 0
         alphabet_columncount += 1
-    #Adds button for restarting the game.
+    # Adds button for restarting the game.
     restart_button = ctk.CTkButton(hangman_window, text="Restart", command=re_run, height=40, width=120,
                                    state="disabled", fg_color="gray", font=("Arial", 25))
-    restart_button.grid(row=6, column=1, columnspan=4)
+    restart_button.grid(row=6, column=1, columnspan=4, rowspan=2)
+    # Difficulty selection label and button.
+    difficulty_label = ctk.CTkLabel(hangman_window, text="Word Difficulty", height=20, width=90)
+    difficulty_label.grid(row=6, column=5, columnspan=4)
+    difficulty_button = ctk.CTkOptionMenu(hangman_window, values=["Easy", "Normal", "Hard", "Legend"],
+                                          height=20, width=90)
+    difficulty_button.grid(row=7, column=5, columnspan=4)
+    # Label for counting wins.
     number_of_wins = ctk.CTkLabel(hangman_window, text="Wins: 0")
     number_of_wins.grid(row=6, column=0)
     print(number_of_wins.cget("text"))

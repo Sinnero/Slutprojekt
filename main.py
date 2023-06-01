@@ -9,12 +9,13 @@ except(NotADirectoryError):
     path = os.path.join(os.getcwd(), directory)
     os.mkdir(path)
 def load_scripts_descriptions(files_list):
-    description_dict = {} #Dictionary som ska innehålla namn och descriptions på alla scripts
+    description_dict = {} # Dictionary som kommer innehålla namn och descriptions på alla scripts i scripts filen.
     for files in files_list:
         with open(files, "r") as file:
             lines = file.readlines()
             description = ""
             line = 0
+            #Checkar om filen har en description som ska visas i scriptloadern eller inte.
             for item in lines:
                 if item[0] == "#":
                     description += item[1:]
@@ -39,7 +40,7 @@ def graphical_menu():
 
     ctk.set_appearance_mode("Dark")
     ctk.set_default_color_theme("dark-blue")
-    appWidth, appHeight = 760, 700
+    appWidth, appHeight = 760, 600
 
     class App(ctk.CTk):
         def __init__(self, *args, **kwargs):
@@ -53,30 +54,16 @@ def graphical_menu():
             self.resizable(False, False)
 
             # Name Labels
-            self.nameLabel = ctk.CTkLabel(self,
-                                          text="Scripts")
-            self.nameLabel.grid(row=0, column=0,
-                                padx=20, pady=20,
-                                sticky="ew")
-            self.nameLabel = ctk.CTkLabel(self,
-                                          text="Description")
-            self.nameLabel.grid(row=0, column=1,
-                                padx=20, pady=20,
-                                sticky="ew")
-            self.nameLabel = ctk.CTkLabel(self,
-                                          text="")
-            self.nameLabel.grid(column=5)
-            self.nameLabel = ctk.CTkLabel(self,
-                                          text="")
-            self.nameLabel.grid(column=6)
             self.scriptInit = tk.StringVar(value="None")
-            row_count = 3
+            row_count = 2
             column_count = 0
             all_scripts = load_scripts()
+            scrollable_buttons = ctk.CTkScrollableFrame(self, height=175, width=500)
+            scrollable_buttons.grid(row=1, column=0, columnspan=3)
             for script in all_scripts:
                 description = str(all_scripts[script])
                 #Name box for all the individual scripts
-                self.scriptText = ctk.CTkRadioButton(self,
+                self.scriptText = ctk.CTkRadioButton(scrollable_buttons,
                                                  text=script[2:len(script)-3],
                                                  variable=self.scriptInit,
                                                  value=script)
@@ -84,7 +71,7 @@ def graphical_menu():
                                  padx=20, pady=10,
                                  sticky="ew")
                 #Individual description for all scripts.
-                self.desc_previewLabel = ctk.CTkLabel(self,
+                self.desc_previewLabel = ctk.CTkLabel(scrollable_buttons,
                                                       text=f'{description[0:55]}')
                 self.desc_previewLabel.grid(row=row_count, column=column_count + 1,
                                             padx=0, pady=0,
@@ -92,11 +79,11 @@ def graphical_menu():
                 row_count += 1
             #Start script Button
             self.StartScriptButton = ctk.CTkButton(self,
-                                                       text="Start Script",
+                                                       text="Start Selected Script",
                                                        command=self.generateResults,
                                                        width=200)
-            self.StartScriptButton.grid(row=1, column=column_count + 0,
-                                            columnspan=1, padx=0,
+            self.StartScriptButton.grid(row=2, column=0,
+                                            columnspan=2, padx=115,
                                             pady=20, sticky="ew")
             #Input label for "Input" text
             self.inputLabel = ctk.CTkLabel(self,
@@ -172,6 +159,8 @@ def graphical_menu():
                 with open(script_dir, "r") as script:
                     global input_string, outputText
                     input_string = self.inputEntry.get("1.0", "end")
+                    # outputText funktionen kan användas i alla olika scripts som körs genom scriptloadern.
+                    # Det gör så att scripten kan kommunicera en text som ska visas i output fältet.
                     def outputText(output):
                         self.outputDisplayBox.configure(state="normal")
                         self.outputDisplayBox.delete("0.0", "end")
