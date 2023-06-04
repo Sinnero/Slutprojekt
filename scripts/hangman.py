@@ -23,31 +23,31 @@ label.grid(row=0, column=0, padx=20, rowspan=5)
 #Goes through every letter in the random word selected.
 
 def word_selection():
-    global difficulty_button, word_selected
+    global difficulty_button, word_selected, re_run
 
     selected_difficulty = difficulty_button.get()
     # Word list for easy difficulty
-    easy = ['about', 'after', 'again', 'below', 'could', 'every', 'first',
-            'found', 'great', 'house', 'large', 'learn', 'never', 'other',
-            'place', 'plant', 'point', 'right', 'small', 'sound', 'spell',
-            'still', 'study', 'their', 'there', 'these', 'thing', 'think',
-            'three', 'water','where','which','world','would','write']
+    easy = ['perseverance', 'determination', 'accomplishment',
+              'achievement', 'aspiration', 'ambition', 'innovation', 'colonel']
 
     # Word list for normal difficulty
-    normal = ['happy', 'family', 'friend', 'school', 'music',
+    normal = ['adventure', 'challenge', 'knowledge', 'education',
+            'imagination', 'inspiration', 'motivation', 'opportunity',
+            'nauseous']
+
+    # Word list for hard Difficulty
+    hard = ['happy', 'family', 'friend', 'school', 'music',
               'flower', 'guitar', 'piano', 'beach', 'mountain',
               'adventure', 'challenge', 'knowledge', 'education',
               'achieve', 'aspiration', 'ambition', 'innovation',
               'colonel']
 
-    # Word list for hard Difficulty
-    hard = ['adventure', 'challenge', 'knowledge', 'education',
-            'imagination', 'inspiration', 'motivation', 'opportunity',
-            'nauseous']
-
     # Word list for legend Difficulty
-    legend = ['perseverance', 'determination', 'accomplishment',
-              'achievement', 'aspiration', 'ambition', 'innovation', 'colonel']
+    legend = ['about', 'after', 'again', 'below', 'could', 'every', 'first',
+            'found', 'great', 'house', 'large', 'learn', 'never', 'other',
+            'place', 'plant', 'point', 'right', 'small', 'sound', 'spell',
+            'still', 'study', 'their', 'there', 'these', 'thing', 'think',
+            'three', 'water','where','which','world','would','write']
 
     if selected_difficulty == "Easy":
         word_selected = easy[random.randint(0, len(easy)-1)]
@@ -63,6 +63,7 @@ def word_selection():
 
     # Used for counting the number of letters in the selected word.
     count = "1"
+
 
     # Scans the selected word. And displays it as _ _ _ _ in the program.
     for character in word_selected:
