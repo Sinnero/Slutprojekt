@@ -1,6 +1,8 @@
+# Creator: Cyreus
 import os
 import customtkinter as ctk
 import tkinter as tk
+
 
 directory = "scripts"
 try:
@@ -34,15 +36,15 @@ def load_scripts():
     script_names = []
     for filename in os.scandir(): #Går igenom alla filer i katalogen scripts.
         if filename.is_file():
-            if filename.path[len(filename.path)-2:] == "py": #Kollar om filen är python.
-                script_names.append(filename.path)# 8: Tar bort scripts/ i scripts/script.py
+            if filename.path[len(filename.path)-2:] == "py": # Kollar om filen är python.
+                script_names.append(filename.path) # 8: Tar bort scripts/ i scripts/script.py
     return load_scripts_descriptions(script_names)
 
 
 ctk.set_appearance_mode("Dark")
 ctk.set_default_color_theme("dark-blue")
 appWidth, appHeight = 760, 600
-#Class for making the main menu.
+# Class for making the main menu.
 class App(ctk.CTk):
 
     def __init__(self, *args, **kwargs):
@@ -54,7 +56,7 @@ class App(ctk.CTk):
         # Sets the dimensions of the window to 600x700
         self.geometry(f"{appWidth}x{appHeight}")
 
-        #Makes the window unsizeable
+        # Makes the window unsizeable
         self.resizable(False, False)
 
         # Name Labels
@@ -62,12 +64,12 @@ class App(ctk.CTk):
         row_count = 2
         column_count = 0
         all_scripts = load_scripts()
-        #Makes a scrollable interface that contains all scripts.
+        # Makes a scrollable interface that contains all scripts.
         scrollable_buttons = ctk.CTkScrollableFrame(self, height=175, width=500)
         scrollable_buttons.grid(row=1, column=0, columnspan=3)
         for script in all_scripts:
             description = str(all_scripts[script])
-            #Name box for all the individual scripts
+            # Name box for all the individual scripts
             self.scriptText = ctk.CTkRadioButton(scrollable_buttons,
                                              text=script[2:len(script)-3],
                                              variable=self.scriptInit,
@@ -75,14 +77,14 @@ class App(ctk.CTk):
             self.scriptText.grid(row=row_count, column=column_count,
                              padx=20, pady=10,
                              sticky="ew")
-            #Individual description for all scripts.
+            # Individual description for all scripts.
             self.desc_previewLabel = ctk.CTkLabel(scrollable_buttons,
                                                   text=f'{description[0:60]}')
             self.desc_previewLabel.grid(row=row_count, column=column_count + 1,
                                         padx=0, pady=0,
                                         sticky="ew")
             row_count += 1
-        #Start script Button
+        # Start script Button
         self.StartScriptButton = ctk.CTkButton(self,
                                                    text="Start Selected Script",
                                                    command=self.generateResults,
@@ -90,7 +92,7 @@ class App(ctk.CTk):
         self.StartScriptButton.grid(row=2, column=0,
                                         columnspan=2, padx=115,
                                         pady=20, sticky="ew")
-        #Input label for "Input" text
+        # Input label for "Input" text
         self.inputLabel = ctk.CTkLabel(self,
                                       text="Input",
                                       font=("Arial", 18))
@@ -104,7 +106,7 @@ class App(ctk.CTk):
         self.inputEntry.grid(row=int(row_count + 1), column=0,
                              columnspan=1, padx=40,
                              pady=0, sticky="ew")
-        #Input clear button
+        # Input clear button
         self.inputClearButton = ctk.CTkButton(self,
                                                    text="Clear Input",
                                                    command=self.clear_Input_Output,
@@ -112,7 +114,7 @@ class App(ctk.CTk):
         self.inputClearButton.grid(row=int(row_count+2), column=column_count,
                                         columnspan=1, padx=10,
                                         pady=20, sticky="ew")
-        #Output text
+        # Output text
 
         self.outputLabel = ctk.CTkLabel(self,
                                        text="Output",
@@ -137,7 +139,7 @@ class App(ctk.CTk):
         self.outputCopyclipboardButton.grid(row=int(row_count+2), column=column_count + 2,
                                         columnspan=1, padx=0,
                                         pady=20, sticky="ew")
-    #Function for copying current text displayed in output to the clipboard.
+    # Function for copying current text displayed in output to the clipboard.
     def copyClipboard(self):
         outputText = self.outputDisplayBox.get("1.0", "end")
         print(outputText)

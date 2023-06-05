@@ -1,5 +1,5 @@
 #Registry management.
-#Creator: Axel
+#Creator: Cyreus
 import json
 globals()
 ctk.set_appearance_mode("Dark")
@@ -46,16 +46,18 @@ def stay_on_top():
 
 #Function where usage of name, SSN or Phone input fields are used.
 def init_window(commit, Entry_Activated=False, Phone_Activated=False, SSN_Activated=False, Name_Activated=False, placeholder_SSN="YYYYMMDDNNNN"):
+    # Will activate when close button is clicked.
     def close():
         selection_window.deiconify()
         enter_window.destroy()
         return None
-    # Will hide main Registry manager window.
+    # Will hide main Registry manager window and create a new instance with desired input fields.
     selection_window.withdraw()
     ctk.set_appearance_mode("Dark")
     enter_window = ctk.CTkToplevel(selection_window)
     enter_window.title("Selection")
     enter_window.geometry("300x250" + f"+{selection_window.winfo_x()}+{selection_window.winfo_y()}")
+    # The different input fields.
     SSN_Entry = ctk.CTkEntry(enter_window, placeholder_text=placeholder_SSN, height=50, width=150)
     Name_Entry = ctk.CTkEntry(enter_window, placeholder_text="Name", height=50, width=150)
     DoneButton = ctk.CTkButton(enter_window, text="Execute",
@@ -64,6 +66,7 @@ def init_window(commit, Entry_Activated=False, Phone_Activated=False, SSN_Activa
     CloseButton = ctk.CTkButton(enter_window, text="Close", command=lambda: close(), width=75, height=50,
                                 hover_color="red")
     Phone_Entry = ctk.CTkEntry(enter_window, placeholder_text="Phone NR", height=50, width=150)
+    # Entry_message where temprary output of the instance will go such as "Axel has been added to the registry".
     Entry_Message = ctk.CTkTextbox(enter_window, width=150, height=100)
     Entry_Message.configure(state="disabled")
     CloseButton.grid(row=0, column=1, padx=8)
@@ -286,7 +289,7 @@ def Change_registry():
         change_text("Registry assignment terminated.")
         selection_window.deiconify()
 
-# Functyion for rendering everything.
+# Basically the main function for rendering every option.
 def option_taken():
     global scriptInit, selection_window, row_count, \
         Enter_new_person, dump_registret_file, change_text, \
@@ -348,6 +351,7 @@ selection_window.text = ctk.CTkTextbox(selection_window, height=150, state="norm
 selection_window.text.grid(row=int(row_count+3), column=0,
                             columnspan=1, padx=0,
                             pady=20, sticky="ew")
+# Function to be edit the windows main textbox where output will go.
 def change_text(text):
     selection_window.text.configure(state="normal")
     selection_window.text.delete("0.0", "end")
@@ -356,8 +360,9 @@ def change_text(text):
 
 change_text("Output")
 
+#
 selection_window_button = ctk.CTkButton(selection_window,
-                                           text="Done",
+                                           text="Select",
                                            command=option_taken,
                                            width=30)
 

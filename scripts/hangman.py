@@ -1,10 +1,7 @@
 #Hangman, the game.
-#Creator: Axel
-import os
-import customtkinter as ctk
+#Creator: Cyreus
 import random
-import time
-from PIL import Image
+from PIL import Image # Required libraries.
 ctk.set_appearance_mode("Dark")
 hangman_window = ctk.CTkToplevel(self)
 hangman_window.title("Hangman")
