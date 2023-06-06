@@ -1,9 +1,9 @@
 #Registry management.
 #Creator: Cyreus
 import json
-globals()
+
 ctk.set_appearance_mode("Dark")
-selection_window = ctk.CTkToplevel(self)#95244
+selection_window = ctk.CTkToplevel(self)
 selection_window.title("Registry management")
 options = ["Enter new person", "Remove person", "Search for person's phone number",
            "Search for person's date of birth", "See who has given phone number",

@@ -17,12 +17,11 @@ image = ctk.CTkImage(light_image=Image.open(os.getcwd()+"/assets/hangman/number1
 
 error_count = 2 # Counts number of wrong inputs. Used for managing the displayed image.
 
-# Image
+# Render image that shows current stage towards death.
 label = ctk.CTkLabel(hangman_window, image=image, text="")
 label.grid(row=0, column=0, padx=20, rowspan=5)
 
-# Goes through every letter in the random word selected.
-
+# Function used for selecting a new random word from the selected difficulty.
 def word_selection():
     global difficulty_button, word_selected, re_run
 
@@ -177,12 +176,16 @@ def run_buttons():
     number_of_wins.grid(row=6, column=0)
     number_of_losses = ctk.CTkLabel(hangman_window, text="Losses: 0")
     number_of_losses.grid(row=7, column=0)
+
+# Make the window always on top of the main window.
 def stay_on_top():
     global hangman_window, stay_on_top
     hangman_window.lift()
     hangman_window.after(400, stay_on_top)
+
+# Fucntion to close the game properly.
 def close():
-    outputText("Hello")
+    # Delete all variables created by the program.
     for i in globals().copy():
         if i[0:3] == "var":
             globals().pop(i)
