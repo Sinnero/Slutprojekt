@@ -3,10 +3,12 @@ import os
 import customtkinter as ctk
 import tkinter as tk
 
-
+# Directory where the scripts are located.
 directory = "scripts"
+
 try:
     os.chdir(directory)
+
 except(NotADirectoryError):
     path = os.path.join(os.getcwd(), directory)
     os.mkdir(path)
@@ -61,6 +63,7 @@ class App(ctk.CTk):
 
         # Name Labels
         self.scriptInit = tk.StringVar(value="None")
+
         row_count = 2
         column_count = 0
         all_scripts = load_scripts()

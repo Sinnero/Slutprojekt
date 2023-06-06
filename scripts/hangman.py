@@ -1,50 +1,50 @@
 #Hangman, the game.
 #Creator: Cyreus
 import random
-from PIL import Image # Required libraries.
+from PIL import Image # Required libraries minus the libraries that already comes with the script loader.
 ctk.set_appearance_mode("Dark")
 hangman_window = ctk.CTkToplevel(self)
 hangman_window.title("Hangman")
+# Starts the window where the script loader is located on the screen.
 hangman_window.geometry("900x375"+f"+{self.winfo_x()}+{self.winfo_y()}")
 hangman_window.resizable(False, False)
 alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-# Counts number of wrong inputs. Used for managing the displayed image.
-# Counts number of correct inputs
-correct_count = 0
+correct_count = 0 #Counts number of correct inputs
+
 # Image is where current gamestage image will be displayed, such as if you win or lose.
 image = ctk.CTkImage(light_image=Image.open(os.getcwd()+"/assets/hangman/number1.png"),
                      size=(300, 300))
-error_count = 2
+
+error_count = 2 # Counts number of wrong inputs. Used for managing the displayed image.
+
+# Image
 label = ctk.CTkLabel(hangman_window, image=image, text="")
 label.grid(row=0, column=0, padx=20, rowspan=5)
-#Goes through every letter in the random word selected.
+
+# Goes through every letter in the random word selected.
 
 def word_selection():
     global difficulty_button, word_selected, re_run
 
     selected_difficulty = difficulty_button.get()
-    # Word list for easy difficulty
-    easy = ['perseverance', 'determination', 'accomplishment',
-              'achievement', 'aspiration', 'ambition', 'innovation', 'colonel']
+    # Load in word list for each difficulty
 
-    # Word list for normal difficulty
-    normal = ['adventure', 'challenge', 'knowledge', 'education',
-            'imagination', 'inspiration', 'motivation', 'opportunity',
-            'nauseous']
+    # Easy
+    with open("assets/hangman/word_lists/easy.txt", "r") as word_list_file:
+        easy = word_list_file.read().split()
 
-    # Word list for hard Difficulty
-    hard = ['happy', 'family', 'friend', 'school', 'music',
-              'flower', 'guitar', 'piano', 'beach', 'mountain',
-              'adventure', 'challenge', 'knowledge', 'education',
-              'achieve', 'aspiration', 'ambition', 'innovation',
-              'colonel']
+    # Normal
+    with open("assets/hangman/word_lists/normal.txt", "r") as word_list_file:
+        normal = word_list_file.read().split()
 
-    # Word list for legend Difficulty
-    legend = ['about', 'after', 'again', 'below', 'could', 'every', 'first',
-            'found', 'great', 'house', 'large', 'learn', 'never', 'other',
-            'place', 'plant', 'point', 'right', 'small', 'sound', 'spell',
-            'still', 'study', 'their', 'there', 'these', 'thing', 'think',
-            'three', 'water','where','which','world','would','write']
+    # Hard
+    with open("assets/hangman/word_lists/hard.txt", "r") as word_list_file:
+        hard = word_list_file.read().split()
+
+    # Legend
+    with open("assets/hangman/word_lists/legend.txt", "r") as word_list_file:
+        legend = word_list_file.read().split()
+
 
     if selected_difficulty == "Easy":
         word_selected = easy[random.randint(0, len(easy)-1)]
