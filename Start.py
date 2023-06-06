@@ -179,8 +179,11 @@ class App(ctk.CTk):
                     self.outputDisplayBox.delete("0.0", "end")
                     self.outputDisplayBox.insert("0.0", output)
                     self.outputDisplayBox.configure(state="disabled")
+
+                # Start the selected script.
                 try:
                     exec(script.read())
+
                 # Raise the encountered error to the user.
                 except() as error:
                     Window("Error while loading: " + str(script_dir) + error)
